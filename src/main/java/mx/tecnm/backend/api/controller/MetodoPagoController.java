@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.service.MetodoPagoService;
 
@@ -21,7 +22,7 @@ public class MetodoPagoController {
     }
 
     @GetMapping("/{metodo_pago_id}")
-    public MetodoPago obtener(@PathVariable Long metodo_pago_id){
+    public MetodoPago obtener(@PathVariable UUID metodo_pago_id){
         return service.obtener(metodo_pago_id);
     }
 
@@ -31,12 +32,12 @@ public class MetodoPagoController {
     }
 
     @PutMapping("/{metodo_pago_id}")
-    public MetodoPago actualizar(@PathVariable Long metodo_pago_id, @RequestBody MetodoPago metodoPago){
+    public MetodoPago actualizar(@PathVariable UUID metodo_pago_id, @RequestBody MetodoPago metodoPago){
         return service.actualizarPut(metodo_pago_id, metodoPago);
     }
 
     @DeleteMapping("/{metodo_pago_id}")
-    public void eliminar(@PathVariable Long metodo_pago_id){
+    public void eliminar(@PathVariable UUID metodo_pago_id){
         service.eliminar(metodo_pago_id);
     }
 }

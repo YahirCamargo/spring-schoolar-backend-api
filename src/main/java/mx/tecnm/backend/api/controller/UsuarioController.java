@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.Usuario;
 import mx.tecnm.backend.api.service.UsuarioService;
 
@@ -21,7 +22,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{user_id}")
-    public Usuario obtener(@PathVariable Long user_id){
+    public Usuario obtener(@PathVariable UUID user_id){
         return service.obtener(user_id);
     }
 
@@ -31,12 +32,12 @@ public class UsuarioController {
     }
 
     @PutMapping("/{user_id}")
-    public Usuario actualizar(@PathVariable Long user_id, @RequestBody Usuario u) {
+    public Usuario actualizar(@PathVariable UUID user_id, @RequestBody Usuario u) {
         return service.actualizarPut(user_id, u);
     }
 
     @DeleteMapping("/{user_id}")
-    public void eliminar(@PathVariable Long user_id){
+    public void eliminar(@PathVariable UUID user_id){
         service.eliminar(user_id);
     }
 }

@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.model;
 
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -14,7 +15,7 @@ public class Domicilio {
     public Domicilio() {}
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable=false,length=45)
     private String calle;
@@ -42,8 +43,8 @@ public class Domicilio {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private boolean preferido = false;
     
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getCalle() { return calle; }
     public void setCalle(String calle) { this.calle = calle; }

@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.service;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.repository.MetodoPagoRepository;
 
@@ -18,7 +19,7 @@ public class MetodoPagoService {
         return mePaRepo.findAll();
     }
 
-    public MetodoPago obtener(Long metodo_pago_id){
+    public MetodoPago obtener(UUID metodo_pago_id){
         return mePaRepo.findById(metodo_pago_id).orElse(null);
     }
 
@@ -26,7 +27,7 @@ public class MetodoPagoService {
         return mePaRepo.save(mP);
     }
 
-    public MetodoPago actualizarPut(Long metodo_pago_id,MetodoPago mP){
+    public MetodoPago actualizarPut(UUID metodo_pago_id,MetodoPago mP){
         MetodoPago existente = mePaRepo.findById(metodo_pago_id).orElse(null);
         if(existente != null){
             existente.setId(mP.getId());
@@ -37,7 +38,7 @@ public class MetodoPagoService {
         return null;
     }
 
-    public void eliminar(Long metodo_pago_id){
+    public void eliminar(UUID metodo_pago_id){
         mePaRepo.deleteById(metodo_pago_id);
     }
 }

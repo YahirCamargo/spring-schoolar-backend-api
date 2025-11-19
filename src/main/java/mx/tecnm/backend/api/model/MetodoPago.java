@@ -3,7 +3,11 @@ package mx.tecnm.backend.api.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
+
+import java.util.List;
+import java.util.UUID;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "metodos_pago",
@@ -13,9 +17,14 @@ import java.math.BigDecimal;
 )
 public class MetodoPago {
     public MetodoPago() {}
+
+    @OneToMany(mappedBy = "metodoPago", orphanRemoval = true)
+    @JsonManagedReference(value = "metodoPago-pedido-ref")
+    private List<Pedido> pedidos;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false,length = 25)
     private String nombre;
@@ -23,8 +32,8 @@ public class MetodoPago {
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal comision;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
