@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.service;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.Domicilio;
 import mx.tecnm.backend.api.repository.DomicilioRepository;
 
@@ -18,7 +19,7 @@ public class DomicilioService {
         return dRepo.findAll();
     }
 
-    public Domicilio obtener(Long address_id){
+    public Domicilio obtener(UUID address_id){
         return dRepo.findById(address_id).orElse(null);
     }
 
@@ -26,10 +27,10 @@ public class DomicilioService {
         return dRepo.save(domicilio);
     }
 
-    public Domicilio actualizarPut(Long address_id, Domicilio d){
+    public Domicilio actualizarPut(UUID address_id,Domicilio d){
         Domicilio existente = dRepo.findById(address_id).orElse(null);
         if(existente != null){
-            existente.setId(d.getId());
+            existente.setId(address_id);
             existente.setCalle(d.getCalle());
             existente.setNumero(d.getNumero());
             existente.setColonia(d.getColonia());
@@ -40,5 +41,9 @@ public class DomicilioService {
             return guardar(existente);
         }
         return null;
+    }
+
+    public void eliminar(UUID address_id){
+        dRepo.deleteById(address_id);
     }
 }

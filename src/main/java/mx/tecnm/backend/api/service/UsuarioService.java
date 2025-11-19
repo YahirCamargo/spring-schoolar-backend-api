@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.service;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.Usuario;
 import mx.tecnm.backend.api.repository.UsuarioRepository;
 
@@ -18,7 +19,7 @@ public class UsuarioService {
         return userRepo.findAll();
     }
 
-    public Usuario obtener(Long id){
+    public Usuario obtener(UUID id){
         return userRepo.findById(id).orElse(null);
     }
 
@@ -26,7 +27,7 @@ public class UsuarioService {
         return userRepo.save(user);
     }
 
-    public Usuario actualizarPut(Long user_id,Usuario u){
+    public Usuario actualizarPut(UUID user_id,Usuario u){
         Usuario existente = obtener(user_id);
         if (existente != null) {
             existente.setNombre(u.getNombre());
@@ -41,7 +42,7 @@ public class UsuarioService {
         return null;
     }
 
-    public void eliminar(Long user_id) {
+    public void eliminar(UUID user_id) {
         userRepo.deleteById(user_id);
     }
 }

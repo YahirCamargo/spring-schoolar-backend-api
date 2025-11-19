@@ -2,8 +2,10 @@ package mx.tecnm.backend.api.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.CreationTimestamp;
 
 
@@ -13,11 +15,19 @@ import org.hibernate.annotations.CreationTimestamp;
 public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Domicilio> domicilios;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference(value = "usuario-pedido-ref")
+    private List<Pedido> pedidos;
+
+    @OneToMany(mappedBy = "usuario", orphanRemoval = true)
+    @JsonManagedReference(value = "usuario-detalleCarrito-ref")
+    private List<DetalleCarrito> detalleCarrito;
     
     public Usuario() {}
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false, length = 45)
     private String nombre;
@@ -45,8 +55,8 @@ public class Usuario {
     private String rol;
 
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

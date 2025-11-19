@@ -1,8 +1,9 @@
 package mx.tecnm.backend.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import mx.tecnm.backend.api.model.Domicilio;
+import mx.tecnm.backend.api.model.Producto;
 import java.util.UUID;
 
-public interface DomicilioRepository extends JpaRepository<Domicilio, UUID> {
+public interface ProductoRepository extends JpaRepository<Producto, UUID>{
+
 }

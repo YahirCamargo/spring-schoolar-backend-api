@@ -2,6 +2,7 @@ package mx.tecnm.backend.api.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 import mx.tecnm.backend.api.model.Categoria;
 import mx.tecnm.backend.api.service.CategoriaService;
 
@@ -21,7 +22,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{category_id}")
-    public Categoria obtener(@PathVariable Long category_id){
+    public Categoria obtener(@PathVariable UUID category_id){
         return service.obtener(category_id);
     }
 
@@ -31,12 +32,12 @@ public class CategoriaController {
     }
 
     @PutMapping("/{category_id}")
-    public Categoria actualizar(@PathVariable Long category_id, @RequestBody Categoria c){
+    public Categoria actualizar(@PathVariable UUID category_id, @RequestBody Categoria c){
         return service.actualizarPut(category_id, c);
     }
 
     @DeleteMapping("/{category_id}")
-    public void eliminar(@PathVariable Long category_id){
+    public void eliminar(@PathVariable UUID category_id){
         service.eliminar(category_id);
     }
 
