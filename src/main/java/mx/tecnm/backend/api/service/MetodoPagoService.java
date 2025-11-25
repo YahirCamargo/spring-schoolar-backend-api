@@ -4,41 +4,45 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.MetodoPago;
+import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
 import mx.tecnm.backend.api.repository.MetodoPagoRepository;
 
 @Service
 public class MetodoPagoService {
+    private final MetodoPagoRepository mpRepo;
 
-    private final MetodoPagoRepository mePaRepo;
-
-    public MetodoPagoService(MetodoPagoRepository mePaRepo) {
-        this.mePaRepo = mePaRepo;
+    public MetodoPagoService(MetodoPagoRepository mpRepo) {
+        this.mpRepo = mpRepo;
     }
 
-    public List<MetodoPago> listar(){
-        return mePaRepo.findAll();
+    public List<MetodoPago> listar() {
+        return mpRepo.findAll()
+            .stream()
+            .toList();
     }
 
-    public MetodoPago obtener(UUID metodo_pago_id){
-        return mePaRepo.findById(metodo_pago_id).orElse(null);
-    }
-
-    public MetodoPago guardar(MetodoPago mP){
-        return mePaRepo.save(mP);
-    }
-
-    public MetodoPago actualizarPut(UUID metodo_pago_id,MetodoPago mP){
-        MetodoPago existente = mePaRepo.findById(metodo_pago_id).orElse(null);
-        if(existente != null){
-            existente.setId(mP.getId());
-            existente.setNombre(mP.getNombre());
-            existente.setComision(mP.getComision());
-            return guardar(existente);
+    public MetodoPago obtenerPorId(UUID metodo_pago_id) {
+        MetodoPago metodoPago = mpRepo.findById(metodo_pago_id);
+        if (metodoPago == null){
+            return null;
         }
-        return null;
+        return metodoPago;
     }
 
-    public void eliminar(UUID metodo_pago_id){
-        mePaRepo.deleteById(metodo_pago_id);
+    public MetodoPago guardar(MetodoPagoPostDTO metodoPagoACrear){
+        MetodoPago metodoPagoGuardado = mpRepo.save(metodoPagoACrear);
+        return metodoPagoGuardado;
+    }
+
+    public MetodoPago actualizarPut(MetodoPago metodoPago){
+        MetodoPago metodoPagoAActualizar = mpRepo.update(metodoPago);
+        if (metodoPagoAActualizar == null){
+            return null;
+        }
+        return metodoPagoAActualizar;
+    }
+
+    public int eliminar(UUID metodo_pago_id){
+        return mpRepo.deleteById(metodo_pago_id);
     }
 }
