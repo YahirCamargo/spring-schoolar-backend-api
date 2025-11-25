@@ -4,11 +4,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.Categoria;
+import mx.tecnm.backend.api.dto.CategoriaPostDTO;
 import mx.tecnm.backend.api.repository.CategoriaRepository;
 
 @Service
 public class CategoriaService {
-
     private final CategoriaRepository cRepo;
 
     public CategoriaService(CategoriaRepository cRepo) {
@@ -16,28 +16,33 @@ public class CategoriaService {
     }
 
     public List<Categoria> listar() {
-        return cRepo.findAll();
+        return cRepo.findAll()
+            .stream()
+            .toList();
     }
 
-    public Categoria obtener(UUID id){
-        return cRepo.findById(id).orElse(null);
-    }
-
-    public Categoria guardar(Categoria cat){
-        return cRepo.save(cat);
-    }
-
-    public Categoria actualizarPut(UUID category_id,Categoria c){
-        Categoria existente = obtener(category_id);
-        if (existente != null) {
-            existente.setId(c.getId());
-            existente.setNombre(c.getNombre());
-            return guardar(existente);
+    public Categoria obtenerPorId(UUID categoria_id) {
+        Categoria categoria = cRepo.findById(categoria_id);
+        if (categoria == null){
+            return null;
         }
-        return null;
+        return categoria;
     }
 
-    public void eliminar(UUID category_id){
-        cRepo.deleteById(category_id);
+    public Categoria guardar(CategoriaPostDTO categoriaACrear){
+        Categoria categoriaGuardado = cRepo.save(categoriaACrear);
+        return categoriaGuardado;
+    }
+
+    public Categoria actualizarPut(Categoria categoria){
+        Categoria categoriaAActualizar = cRepo.update(categoria);
+        if (categoriaAActualizar == null){
+            return null;
+        }
+        return categoriaAActualizar;
+    }
+
+    public int eliminar(UUID categoria_id){
+        return cRepo.deleteById(categoria_id);
     }
 }

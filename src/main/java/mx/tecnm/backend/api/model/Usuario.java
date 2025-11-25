@@ -1,59 +1,20 @@
 package mx.tecnm.backend.api.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 
-import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.hibernate.annotations.CreationTimestamp;
-
-
-
-@Entity
-@Table(name = "usuarios")
 public class Usuario {
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Domicilio> domicilios;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JsonManagedReference(value = "usuario-pedido-ref")
-    private List<Pedido> pedidos;
-
-    @OneToMany(mappedBy = "usuario", orphanRemoval = true)
-    @JsonManagedReference(value = "usuario-detalleCarrito-ref")
-    private List<DetalleCarrito> detalleCarrito;
-    
-    public Usuario() {}
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
-
-    @Column(nullable = false, length = 45)
     private String nombre;
-    
-    @Column(nullable = false, length = 60, unique = true)
     private String email;
-    
-    @Column(length = 10)
-    private String telefono; 
-    
-    @Column(nullable = false, length = 1) 
+    private String telefono;
     private String sexo;
-
-    @Column(name = "fecha_nacimiento", nullable = false) 
-    private LocalDateTime fechaNacimiento;
-
-    @Column(nullable = false, length = 255)
+    private LocalDate fechaNacimiento;
     private String contrasena;
-
-    @CreationTimestamp
-    @Column(name = "fecha_registro", nullable = false, updatable = false) 
     private LocalDateTime fechaRegistro;
-    
-    @Column(name = "rol", nullable = false, length = 20) 
     private String rol;
-
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -70,13 +31,14 @@ public class Usuario {
     public String getSexo() { return sexo; }
     public void setSexo(String sexo) { this.sexo = sexo; }
 
-    public LocalDateTime getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(LocalDateTime fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) {this.contrasena = contrasena; } 
-    
+    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
