@@ -1,7 +1,6 @@
 package mx.tecnm.backend.api.dto;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class UsuarioPostDTO {
 

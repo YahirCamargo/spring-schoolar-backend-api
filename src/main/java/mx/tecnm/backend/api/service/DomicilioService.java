@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.Domicilio;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
-import mx.tecnm.backend.api.dto.DomicilioPutDTO;
 import mx.tecnm.backend.api.repository.DomicilioRepository;
 
 @Service

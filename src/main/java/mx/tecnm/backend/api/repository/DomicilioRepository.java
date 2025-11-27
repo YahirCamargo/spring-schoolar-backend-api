@@ -3,66 +3,67 @@ package mx.tecnm.backend.api.repository;
 import mx.tecnm.backend.api.model.Domicilio;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
 import mx.tecnm.backend.api.dto.DomicilioPutDTO;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.UUID;
 import java.util.List;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 @Repository
 public class DomicilioRepository {
-    private final JdbcTemplate jdbc;
+    private final JdbcClient jdbc;
 
-    public DomicilioRepository(JdbcTemplate jdbc) {
+    public DomicilioRepository(JdbcClient jdbc) {
         this.jdbc = jdbc;
     }
+
     public List<Domicilio> findAll() {
         String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios";
 
-        return jdbc.query(sql, (rs, rowNum) -> {
+        try{
+            return jdbc.sql(sql)
+                .query((rs, rowNum) -> {
             Domicilio d = new Domicilio();
 
             d.setId(rs.getObject("id", java.util.UUID.class));
-            d.setCalle(rs.getString("calle").trim());
-            d.setNumero(rs.getString("numero").trim());
-            d.setColonia(rs.getString("colonia").trim());
-            d.setCp(rs.getString("cp").trim());
-            d.setEstado(rs.getString("estado").trim());
-            d.setCiudad(rs.getString("ciudad").trim());
-            UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
+            d.setCalle(rs.getString("calle"));
+            d.setNumero(rs.getString("numero"));
+            d.setColonia(rs.getString("colonia"));
+            d.setCp(rs.getString("cp"));
+            d.setEstado(rs.getString("estado"));
+            d.setCiudad(rs.getString("ciudad"));
+            //UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
             d.setPreferido(rs.getBoolean("preferido"));
 
             return d;
-        });
+        })
+        .list();
+        }catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public Domicilio findById(UUID domicilio_id) {
         String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE id = ?::uuid";
         
-        RowMapper<Domicilio> rowMapper = (rs, rowNum) -> {
-            Domicilio d = new Domicilio();
-            d.setId(rs.getObject("id", java.util.UUID.class));
-            d.setCalle(rs.getString("calle").trim());
-            d.setNumero(rs.getString("numero").trim());
-            d.setColonia(rs.getString("colonia").trim());
-            d.setCp(rs.getString("cp").trim());
-            d.setEstado(rs.getString("estado").trim());
-            d.setCiudad(rs.getString("ciudad").trim());
-            UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
-            d.setPreferido(rs.getBoolean("preferido"));
-
-            return d;
-        };
-
         try {
-            return jdbc.queryForObject(sql, new Object[]{ domicilio_id }, rowMapper);
+            return jdbc.sql(sql)
+                .query((rs,rowNum) ->{
+                    Domicilio d = new Domicilio();
+                    d.setId(rs.getObject("id", java.util.UUID.class));
+                    d.setCalle(rs.getString("calle"));
+                    d.setNumero(rs.getString("numero"));
+                    d.setColonia(rs.getString("colonia"));
+                    d.setCp(rs.getString("cp"));
+                    d.setEstado(rs.getString("estado"));
+                    d.setCiudad(rs.getString("ciudad"));
+                    //UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
+                    d.setPreferido(rs.getBoolean("preferido"));
+
+                    return d;
+                }).single();
+            
         } catch (EmptyResultDataAccessException e) {
             return null; 
         }
@@ -70,30 +71,34 @@ public class DomicilioRepository {
 
     public Domicilio save(DomicilioPostDTO domicilioACrear) {
 
-        String sql = "INSERT INTO domicilios (calle,numero,colonia,cp,estado,ciudad,usuarios_id,preferido) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
+        String sql = """
+        INSERT INTO domicilios (calle,numero,colonia,cp,estado,ciudad,usuarios_id,preferido) 
+        VALUES (:calle,:numero,:colonia,:cp,:estado,:ciudad,:usuarios_id,:preferido) RETURNING id
+        """;
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, domicilioACrear.getCalle());
-            ps.setString(2, domicilioACrear.getNumero());
-            ps.setString(3, domicilioACrear.getColonia());
-            ps.setString(4, domicilioACrear.getCp());
-            ps.setString(5, domicilioACrear.getEstado());
-            ps.setString(6, domicilioACrear.getCiudad());
-            ps.setObject(7, domicilioACrear.getUsuarioId());
-            ps.setBoolean(8, domicilioACrear.getPreferido()); 
-            return ps;
-        }, keyHolder);
+        UUID generatedId = jdbc.sql(sql)
+            .param("calle", domicilioACrear.getCalle())
+            .param("numero", domicilioACrear.getNumero())
+            .param("colonia", domicilioACrear.getColonia())
+            .param("cp", domicilioACrear.getCp())
+            .param("estado", domicilioACrear.getEstado())
+            .param("ciudad", domicilioACrear.getCiudad())
+            .param("usuarios_id", domicilioACrear.getUsuarioId())
+            .param("preferido", domicilioACrear.getPreferido())
+            .query((rs,rowNum)-> rs.getObject("id",UUID.class))
+            .single();
 
-        UUID generatedId = keyHolder.getKeyAs(UUID.class);
-        //java.sql.Timestamp generatedTimestamp = (java.sql.Timestamp) keyHolder.getKeys().get("fecha_registro");
 
         Domicilio nuevoDomicilio = findById(generatedId);
 
-        //nuevoDomicilio.setId(generatedId);
-        //nuevoDomicilio.setFechaRegistro(generatedTimestamp.toLocalDateTime());
-        //nuevoDomicilio.setNombre(domicilioACrear.getNombre());
+        nuevoDomicilio.setId(generatedId);
+        nuevoDomicilio.setCalle(domicilioACrear.getCalle());
+        nuevoDomicilio.setNumero(domicilioACrear.getNumero());
+        nuevoDomicilio.setColonia(domicilioACrear.getColonia());
+        nuevoDomicilio.setCp(domicilioACrear.getCp());
+        nuevoDomicilio.setEstado(domicilioACrear.getEstado());
+        nuevoDomicilio.setCiudad(domicilioACrear.getCiudad());
+        nuevoDomicilio.setPreferido(domicilioACrear.getPreferido());
         
         return nuevoDomicilio;
     }
@@ -101,48 +106,46 @@ public class DomicilioRepository {
     public Domicilio update(DomicilioPutDTO domicilio) {
         
         String sql = "UPDATE domicilios SET "
-                + "calle = ?, "
-                + "numero = ?, "
-                + "colonia = ?, "
-                + "cp = ?, "
-                + "estado = ?, "
-                + "ciudad = ?, "
-                + "preferido = ? "
-                + "WHERE id = ?";
+                + "calle = :calle, "
+                + "numero = :numero, "
+                + "colonia = :colonia, "
+                + "cp = :cp, "
+                + "estado = :estado, "
+                + "ciudad = :ciudad, "
+                + "preferido = :preferido "
+                + "WHERE id = :id";
 
-        int rowsAffected = jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, domicilio.getCalle());
-            ps.setString(2, domicilio.getNumero());
-            ps.setString(3, domicilio.getColonia());
-            ps.setString(4, domicilio.getCp());
-            ps.setString(5, domicilio.getEstado());
-            ps.setString(6, domicilio.getCiudad());
-            ps.setBoolean(7, domicilio.isPreferido());
-            ps.setObject(8, domicilio.getId()); 
+        int rowsAffected = jdbc.sql(sql)
+            .param("calle", domicilio.getCalle())
+            .param("numero", domicilio.getNumero())
+            .param("colonia", domicilio.getColonia())
+            .param("cp", domicilio.getCp())
+            .param("estado", domicilio.getEstado())
+            .param("ciudad", domicilio.getCiudad())
+            .param("preferido", domicilio.isPreferido())
+            .param("id",domicilio.getId())
+            .update();
             
-            return ps;
-        });
-
         if (rowsAffected == 0) {
             return null;
         }
-        
+
         Domicilio domicilioActualizado = this.findById(domicilio.getId());
- 
-        
         return domicilioActualizado;
     }
 
     public int deleteById(UUID domicilio_id) {
-        String sql = "DELETE FROM domicilios WHERE id = ?::uuid";
-        int rowsAffected = jdbc.update(sql, domicilio_id);
+        String sql = "DELETE FROM domicilios WHERE id = :id";
+        int rowsAffected = jdbc.sql(sql)
+            .param("id",domicilio_id)
+            .update();
         return rowsAffected;
     }
 
-    public int unsetPreferredByUserId(UUID usuarioId) {
-        String sql = "UPDATE domicilios SET preferido = FALSE WHERE usuarios_id = ? AND preferido = TRUE";
+    public int unsetPreferredByUserId(UUID domicilio_id) {
+        String sql = "UPDATE domicilios SET preferido = FALSE WHERE usuarios_id = :id AND preferido = TRUE";
 
-        return jdbc.update(sql, usuarioId);
+        return jdbc.sql(sql)
+            .param("id",domicilio_id).update();
     }
 }

@@ -4,8 +4,6 @@ import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.math.BigDecimal;
-import java.sql.Types;
 import java.util.UUID;
 import java.util.List;
 
