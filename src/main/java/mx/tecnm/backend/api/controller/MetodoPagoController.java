@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
+import mx.tecnm.backend.api.dto.MetodoPagoGetDTO;
 import mx.tecnm.backend.api.service.MetodoPagoService;
 
 @RestController
@@ -21,19 +22,20 @@ public class MetodoPagoController {
     }
 
     @GetMapping
-    public List<MetodoPago> listar() {
+    public List<MetodoPagoGetDTO> listar() {
         return service.listar();
     }
 
     @GetMapping("/{metodo_pago_id}")
-    public ResponseEntity<MetodoPago> obtenerPorId(@PathVariable UUID metodo_pago_id) {
-        MetodoPago metodoPago = service.obtenerPorId(metodo_pago_id);
+    public ResponseEntity<MetodoPagoGetDTO> obtenerPorId(@PathVariable UUID metodo_pago_id) {
+        MetodoPagoGetDTO metodoPago = service.obtenerPorId(metodo_pago_id);
         
         if (metodoPago == null) {
             return ResponseEntity.notFound().build(); 
         }
         return ResponseEntity.ok(metodoPago); 
     }
+
 
     @PostMapping
     public ResponseEntity<MetodoPago> crear(@RequestBody MetodoPagoPostDTO metodoPago){
@@ -47,7 +49,7 @@ public class MetodoPagoController {
     }
 
     @PutMapping
-    public ResponseEntity<MetodoPago> actualizar(@RequestBody MetodoPago metodoPago){
+    public ResponseEntity<MetodoPago> actualizar(@RequestBody MetodoPagoGetDTO metodoPago){
         MetodoPago metodoPagoAActualizar = service.actualizarPut(metodoPago);
         if(metodoPagoAActualizar == null){
             return ResponseEntity.notFound().build(); 
