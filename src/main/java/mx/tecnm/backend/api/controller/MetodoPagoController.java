@@ -1,6 +1,7 @@
 package mx.tecnm.backend.api.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.net.URI;
@@ -37,7 +38,11 @@ public class MetodoPagoController {
     @PostMapping
     public ResponseEntity<MetodoPago> crear(@RequestBody MetodoPagoPostDTO metodoPago){
         MetodoPago metodoPagoACrear = service.guardar(metodoPago);
-        URI ubicacion = URI.create("/metodo-pago/" + metodoPagoACrear.getId());
+        URI ubicacion = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(metodoPagoACrear.getId())
+            .toUri();
         return ResponseEntity.created(ubicacion).body(metodoPagoACrear);
     }
 

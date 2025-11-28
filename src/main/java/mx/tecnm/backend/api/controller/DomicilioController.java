@@ -1,6 +1,7 @@
 package mx.tecnm.backend.api.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.net.URI;
@@ -37,7 +38,11 @@ public class DomicilioController {
     @PostMapping
     public ResponseEntity<Domicilio> crear(@RequestBody DomicilioPostDTO domicilio){
         Domicilio domicilioACrear = service.guardar(domicilio);
-        URI ubicacion = URI.create("/addresses/" + domicilioACrear.getId());
+        URI ubicacion = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(domicilioACrear.getId())
+            .toUri();
         return ResponseEntity.created(ubicacion).body(domicilioACrear);
     }
 
