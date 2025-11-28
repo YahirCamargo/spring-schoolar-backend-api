@@ -81,8 +81,8 @@ public class CategoriaRepository {
         return findById(categoria.getId());
     }
 
-    public int deleteById(UUID id) {
-        String sql = "DELETE FROM categorias WHERE id = :id";
+    public int deactivateById(UUID id) {
+        String sql = "UPDATE categorias SET activo=FALSE WHERE id = :id";
 
         return jdbc.sql(sql)
                 .param("id", id)

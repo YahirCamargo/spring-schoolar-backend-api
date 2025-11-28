@@ -43,6 +43,6 @@ public class CategoriaService {
     }
 
     public int eliminar(UUID categoria_id){
-        return cRepo.deleteById(categoria_id);
+        return cRepo.deactivateById(categoria_id);
     }
 }

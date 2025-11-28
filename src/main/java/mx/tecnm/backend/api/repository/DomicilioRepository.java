@@ -134,8 +134,8 @@ public class DomicilioRepository {
         return domicilioActualizado;
     }
 
-    public int deleteById(UUID domicilio_id) {
-        String sql = "DELETE FROM domicilios WHERE id = :id";
+    public int deactivateById(UUID domicilio_id) {
+        String sql = "UPDATE domicilios SET activo=FALSE WHERE id = :id";
         int rowsAffected = jdbc.sql(sql)
             .param("id",domicilio_id)
             .update();

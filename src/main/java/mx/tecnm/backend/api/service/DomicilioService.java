@@ -51,6 +51,6 @@ public class DomicilioService {
     */
 
     public int eliminar(UUID domicilio_id){
-        return dRepo.deleteById(domicilio_id);
+        return dRepo.deactivateById(domicilio_id);
     }
 }

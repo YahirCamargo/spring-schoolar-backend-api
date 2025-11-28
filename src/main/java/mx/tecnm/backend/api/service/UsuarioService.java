@@ -47,7 +47,7 @@ public class UsuarioService {
     }
 
     public int eliminar(UUID usuario_id){
-        return userRepo.deleteById(usuario_id);
+        return userRepo.deactivateById(usuario_id);
     }
 
     private UsuarioDTO toDTO(Usuario u) {
@@ -60,33 +60,4 @@ public class UsuarioService {
                 u.getFechaNacimiento()
         );
     }
-
-/* 
-    public Usuario obtener(UUID id){
-        return userRepo.findById(id).orElse(null);
-    }
-
-    public Usuario guardar(Usuario user) {
-        return userRepo.save(user);
-    }
-
-    public Usuario actualizarPut(UUID user_id,Usuario u){
-        Usuario existente = obtener(user_id);
-        if (existente != null) {
-            existente.setNombre(u.getNombre());
-            existente.setEmail(u.getEmail());
-            existente.setTelefono(u.getTelefono());
-            existente.setSexo(u.getSexo());
-            existente.setFechaNacimiento(u.getFechaNacimiento());
-            existente.setContrasena(u.getContrasena());
-            existente.setRol(u.getRol());
-            return guardar(existente);
-        }
-        return null;
-    }
-
-    public void eliminar(UUID user_id) {
-        userRepo.deleteById(user_id);
-    }
-*/
 }

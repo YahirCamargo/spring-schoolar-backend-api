@@ -11,6 +11,7 @@ public class Domicilio {
     private String ciudad;
     private Usuario usuario;
     private boolean preferido;
+    private boolean activo;
     
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -38,4 +39,7 @@ public class Domicilio {
 
     public boolean isPreferido() { return preferido; }
     public void setPreferido(boolean preferido) { this.preferido=preferido; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo =  activo; }
 }

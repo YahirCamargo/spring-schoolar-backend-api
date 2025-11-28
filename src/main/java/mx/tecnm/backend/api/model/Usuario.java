@@ -15,6 +15,7 @@ public class Usuario {
     private String contrasena;
     private LocalDateTime fechaRegistro;
     private String rol;
+    private boolean activo;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -42,4 +43,7 @@ public class Usuario {
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo =  activo; }
 }

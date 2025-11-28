@@ -117,8 +117,8 @@ public class UsuarioRepository {
     }
 
 
-    public int deleteById(UUID user_id) {
-        String sql = "DELETE FROM usuarios WHERE id = :id";
+    public int deactivateById(UUID user_id) {
+        String sql = "UPDATE usuarios SET activo=FALSE WHERE id = :id";
         return jdbc.sql(sql)
             .param("id",user_id)
             .update();
