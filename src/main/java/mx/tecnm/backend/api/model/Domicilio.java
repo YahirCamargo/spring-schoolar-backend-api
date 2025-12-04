@@ -9,7 +9,7 @@ public class Domicilio {
     private String cp;
     private String estado;
     private String ciudad;
-    private Usuario usuario;
+    private UUID usuarioId;
     private boolean preferido;
     private boolean activo;
     
@@ -34,8 +34,8 @@ public class Domicilio {
     public String getCiudad() { return ciudad; }
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public UUID getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(UUID usuarioId) { this.usuarioId = usuarioId; }
 
     public boolean isPreferido() { return preferido; }
     public void setPreferido(boolean preferido) { this.preferido=preferido; }

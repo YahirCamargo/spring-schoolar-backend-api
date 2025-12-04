@@ -3,7 +3,6 @@ package mx.tecnm.backend.api.repository;
 
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
-import mx.tecnm.backend.api.dto.MetodoPagoGetDTO;
 import java.util.UUID;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class MetodoPagoRepository {
         this.jdbc = jdbc;
     }
     public List<MetodoPago> findAll() {
-        String sql = "SELECT id,nombre,comision, activo FROM metodos_pago WHERE activo= TRUE";
+        String sql = "SELECT id,nombre,comision FROM metodos_pago WHERE activo=TRUE";
 
         return jdbc.sql(sql)
                         .query((rs, rowNum) -> {
@@ -29,7 +28,6 @@ public class MetodoPagoRepository {
                             mP.setId(rs.getObject("id", UUID.class));
                             mP.setNombre(rs.getString("nombre"));
                             mP.setComision(rs.getBigDecimal("comision"));
-                            mP.setActivo(rs.getBoolean("activo"));
                             return mP;
                         })
                         .list();
@@ -37,7 +35,7 @@ public class MetodoPagoRepository {
     }
 
     public MetodoPago findById(UUID metodo_pago_id) {
-        String sql = "SELECT id,nombre,comision,activo FROM metodos_pago WHERE id = :id AND activo = TRUE";
+        String sql = "SELECT id,nombre,comision FROM metodos_pago WHERE id = :id AND activo = TRUE";
     
         try {
             return jdbc.sql(sql).param("id",metodo_pago_id)
@@ -46,7 +44,6 @@ public class MetodoPagoRepository {
                             mP.setId(rs.getObject("id", UUID.class));
                             mP.setNombre(rs.getString("nombre"));
                             mP.setComision(rs.getBigDecimal("comision"));
-                            mP.setActivo(rs.getBoolean("activo"));
                             return mP;
                         })
                         .single();
@@ -73,26 +70,26 @@ public class MetodoPagoRepository {
         return nueva;
     }
 
-    public MetodoPago update(MetodoPagoGetDTO metodoPago) {
+    public MetodoPago update(MetodoPagoPostDTO metodoPago, UUID metodoPagoId) {
         
         String sql = "UPDATE metodos_pago SET "
                 + "nombre = :nombre, "
                 + "comision = :comision "
-                + "WHERE id = :id";
+                + "WHERE id = :id AND activo=TRUE";
 
         int rowsAffected = jdbc.sql(sql)
                 .param("nombre", metodoPago.getNombre())
                 .param("comision", metodoPago.getComision())
-                .param("id", metodoPago.getId())
+                .param("id", metodoPagoId)
                 .update();
 
         if (rowsAffected == 0) return null;
 
-        return findById(metodoPago.getId());
+        return findById(metodoPagoId);
     }
 
     public int deleteById(UUID metodo_pago_id) {
-        String sql = "UPDATE metodos_pago SET activo=FALSE WHERE id = :id";
+        String sql = "UPDATE metodos_pago SET activo=FALSE WHERE id = :id AND activo=TRUE";
 
         return jdbc.sql(sql)
                 .param("id", metodo_pago_id)

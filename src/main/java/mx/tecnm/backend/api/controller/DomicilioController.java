@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.net.URI;
 import java.util.UUID;
-import mx.tecnm.backend.api.model.Domicilio;
+
+import mx.tecnm.backend.api.dto.DomicilioGetDTO;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
 import mx.tecnm.backend.api.service.DomicilioService;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Direcciones", description = "Endpoints para la gestión de direcciones.")
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/api/direcciones")
 @CrossOrigin(origins = "*")
 public class DomicilioController {
     private final DomicilioService service;
@@ -21,13 +23,13 @@ public class DomicilioController {
     }
 
     @GetMapping
-    public List<Domicilio> listar() {
+    public List<DomicilioGetDTO> listar() {
         return service.listar();
     }
 
-    @GetMapping("/{domicilio_id}")
-    public ResponseEntity<Domicilio> obtenerPorId(@PathVariable UUID domicilio_id) {
-        Domicilio domicilio = service.obtenerPorId(domicilio_id);
+    @GetMapping("/{direccionId}")
+    public ResponseEntity<DomicilioGetDTO> obtenerPorId(@PathVariable UUID direccionId) {
+        DomicilioGetDTO domicilio = service.obtenerPorId(direccionId);
         
         if (domicilio == null) {
             return ResponseEntity.notFound().build(); 
@@ -36,8 +38,8 @@ public class DomicilioController {
     }
 
     @PostMapping
-    public ResponseEntity<Domicilio> crear(@RequestBody DomicilioPostDTO domicilio){
-        Domicilio domicilioACrear = service.guardar(domicilio);
+    public ResponseEntity<DomicilioGetDTO> crear(@RequestBody DomicilioPostDTO domicilio){
+        DomicilioGetDTO domicilioACrear = service.guardar(domicilio);
         URI ubicacion = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -46,20 +48,9 @@ public class DomicilioController {
         return ResponseEntity.created(ubicacion).body(domicilioACrear);
     }
 
-    /* 
-    @PutMapping
-    public ResponseEntity<Domicilio> actualizar(@RequestBody Domicilio domicilio){
-        Domicilio domicilioAActualizar = service.actualizarPut(domicilio);
-        if(domicilioAActualizar == null){
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(domicilioAActualizar);
-    }
-    */
-
-    @DeleteMapping("/{domicilio_id}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID domicilio_id){
-        int columnasAfectadas = service.eliminar(domicilio_id);
+    @DeleteMapping("/{direccionId}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID direccionId){
+        int columnasAfectadas = service.eliminar(direccionId);
         if(columnasAfectadas == 0){
             return ResponseEntity.notFound().build();
         }

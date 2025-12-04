@@ -20,7 +20,7 @@ public class UsuarioRepository {
 
     public List<Usuario> findAll() {
 
-        String sql = "SELECT id,nombre,email,telefono,sexo,fecha_nacimiento,fecha_registro FROM usuarios";
+        String sql = "SELECT id,nombre,email,telefono,sexo,fecha_nacimiento,fecha_registro FROM usuarios WHERE activo=TRUE";
 
             return jdbc.sql(sql)
                 .query((rs, rowNum) -> {
@@ -37,7 +37,7 @@ public class UsuarioRepository {
     }
 
     public Usuario findById(UUID usuario_id) {
-        String sql = "SELECT id,nombre,email,telefono,sexo,fecha_nacimiento,rol FROM usuarios WHERE id = ?::uuid";
+        String sql = "SELECT id,nombre,email,telefono,sexo,fecha_nacimiento,rol FROM usuarios WHERE id = :id AND activo=TRUE";
         
         try {
             return jdbc.sql(sql)
@@ -87,7 +87,7 @@ public class UsuarioRepository {
     }
 
 
-    public Usuario update(UsuarioPutDTO usuario) {
+    public Usuario update(UsuarioPutDTO usuario, UUID usuarioId) {
         String sql = """
             UPDATE usuarios SET
                 nombre = :nombre,
@@ -96,7 +96,7 @@ public class UsuarioRepository {
                 sexo = :sexo,
                 fecha_nacimiento = :fecha_nacimiento,
                 contrasena = :contrasena
-            WHERE id = :id
+            WHERE id = :id AND activo=TRUE
             """;
 
         int rows = jdbc.sql(sql)
@@ -106,19 +106,19 @@ public class UsuarioRepository {
                 .param("sexo", usuario.getSexo())
                 .param("fecha_nacimiento", java.sql.Date.valueOf(usuario.getFechaNacimiento()))
                 .param("contrasena", usuario.getContrasena())
-                .param("id", usuario.getId())
+                .param("id", usuarioId)
                 .update();
 
         if (rows == 0) {
             return null;
         }
 
-        return this.findById(usuario.getId());
+        return this.findById(usuarioId);
     }
 
 
     public int deactivateById(UUID user_id) {
-        String sql = "UPDATE usuarios SET activo=FALSE WHERE id = :id";
+        String sql = "UPDATE usuarios SET activo=FALSE WHERE id = :id AND activo=TRUE";
         return jdbc.sql(sql)
             .param("id",user_id)
             .update();

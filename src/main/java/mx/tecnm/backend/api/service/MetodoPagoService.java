@@ -36,8 +36,8 @@ public class MetodoPagoService {
         return metodoPagoGuardado;
     }
 
-    public MetodoPago actualizarPut(MetodoPagoGetDTO metodoPago){
-        MetodoPago metodoPagoAActualizar = mpRepo.update(metodoPago);
+    public MetodoPago actualizarPut(MetodoPagoPostDTO metodoPago, UUID metodoPagoId){
+        MetodoPago metodoPagoAActualizar = mpRepo.update(metodoPago,metodoPagoId);
         if (metodoPagoAActualizar == null){
             return null;
         }

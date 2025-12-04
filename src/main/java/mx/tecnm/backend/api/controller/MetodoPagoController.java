@@ -10,9 +10,10 @@ import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
 import mx.tecnm.backend.api.dto.MetodoPagoGetDTO;
 import mx.tecnm.backend.api.service.MetodoPagoService;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Metodos de Pago", description = "Endpoints para la gestión de los metodos de pago.")
 @RestController
-@RequestMapping("/api/metodo-pago")
+@RequestMapping("/api/metodos-pago")
 @CrossOrigin(origins = "*")
 public class MetodoPagoController {
     private final MetodoPagoService service;
@@ -26,9 +27,9 @@ public class MetodoPagoController {
         return service.listar();
     }
 
-    @GetMapping("/{metodo_pago_id}")
-    public ResponseEntity<MetodoPagoGetDTO> obtenerPorId(@PathVariable UUID metodo_pago_id) {
-        MetodoPagoGetDTO metodoPago = service.obtenerPorId(metodo_pago_id);
+    @GetMapping("/{metodoPagoId}")
+    public ResponseEntity<MetodoPagoGetDTO> obtenerPorId(@PathVariable UUID metodoPagoId) {
+        MetodoPagoGetDTO metodoPago = service.obtenerPorId(metodoPagoId);
         
         if (metodoPago == null) {
             return ResponseEntity.notFound().build(); 
@@ -48,18 +49,18 @@ public class MetodoPagoController {
         return ResponseEntity.created(ubicacion).body(metodoPagoACrear);
     }
 
-    @PutMapping
-    public ResponseEntity<MetodoPago> actualizar(@RequestBody MetodoPagoGetDTO metodoPago){
-        MetodoPago metodoPagoAActualizar = service.actualizarPut(metodoPago);
+    @PutMapping("/{metodoPagoId}")
+    public ResponseEntity<MetodoPago> actualizar(@PathVariable UUID metodoPagoId,@RequestBody MetodoPagoPostDTO metodoPago){
+        MetodoPago metodoPagoAActualizar = service.actualizarPut(metodoPago,metodoPagoId);
         if(metodoPagoAActualizar == null){
             return ResponseEntity.notFound().build(); 
         }
         return ResponseEntity.ok(metodoPagoAActualizar);
     }
 
-    @DeleteMapping("/{metodo_pago_id}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID metodo_pago_id){
-        int columnasAfectadas = service.eliminar(metodo_pago_id);
+    @DeleteMapping("/{metodoPagoId}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID metodoPagoId){
+        int columnasAfectadas = service.eliminar(metodoPagoId);
         if(columnasAfectadas == 0){
             return ResponseEntity.notFound().build();
         }

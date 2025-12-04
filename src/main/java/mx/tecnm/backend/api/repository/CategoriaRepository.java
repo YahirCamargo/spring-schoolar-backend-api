@@ -19,7 +19,7 @@ public class CategoriaRepository {
     }
 
     public List<Categoria> findAll() {
-        String sql = "SELECT id, nombre FROM categorias";
+        String sql = "SELECT id, nombre FROM categorias WHERE activo=TRUE";
 
         return jdbc.sql(sql)
                 .query((rs, rowNum) -> {
@@ -32,7 +32,7 @@ public class CategoriaRepository {
     }
 
     public Categoria findById(UUID categoriaId) {
-        String sql = "SELECT id, nombre FROM categorias WHERE id = :id";
+        String sql = "SELECT id, nombre FROM categorias WHERE id = :id AND activo=TRUE";
 
         try {
             return jdbc.sql(sql)
@@ -64,25 +64,25 @@ public class CategoriaRepository {
         return nueva;
     }
 
-    public Categoria update(Categoria categoria) {
+    public Categoria update(CategoriaPostDTO categoria, UUID categoriaId) {
         String sql = """
                 UPDATE categorias SET
                     nombre = :nombre
-                WHERE id = :id
+                WHERE id = :id AND activo=TRUE
                 """;
 
         int rowsAffected = jdbc.sql(sql)
                 .param("nombre", categoria.getNombre())
-                .param("id", categoria.getId())
+                .param("id", categoriaId)
                 .update();
 
         if (rowsAffected == 0) return null;
 
-        return findById(categoria.getId());
+        return findById(categoriaId);
     }
 
     public int deactivateById(UUID id) {
-        String sql = "UPDATE categorias SET activo=FALSE WHERE id = :id";
+        String sql = "UPDATE categorias SET activo=FALSE WHERE id = :id AND activo=TRUE";
 
         return jdbc.sql(sql)
                 .param("id", id)

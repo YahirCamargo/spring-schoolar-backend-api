@@ -1,11 +1,8 @@
 package mx.tecnm.backend.api.dto;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class UsuarioPutDTO {
-
-    private final UUID id;
     private final String nombre;
     private final String email;
     private final String telefono;
@@ -13,8 +10,7 @@ public class UsuarioPutDTO {
     private final LocalDate fechaNacimiento;
     private final String contrasena;
 
-    public UsuarioPutDTO(UUID id,String nombre,String email,String telefono,String sexo,LocalDate fechaNacimiento,String contrasena) {
-        this.id = id;
+    public UsuarioPutDTO(String nombre,String email,String telefono,String sexo,LocalDate fechaNacimiento,String contrasena) {
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
@@ -23,7 +19,6 @@ public class UsuarioPutDTO {
         this.contrasena = contrasena;
     }
 
-    public UUID getId() { return id; }
     public String getNombre() { return nombre; }
     public String getEmail() { return email; }
     public String getTelefono() { return telefono; }

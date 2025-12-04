@@ -19,7 +19,7 @@ public class DomicilioRepository {
     }
 
     public List<Domicilio> findAll() {
-        String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios";
+        String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE activo=TRUE";
 
         try{
             return jdbc.sql(sql)
@@ -33,7 +33,7 @@ public class DomicilioRepository {
             d.setCp(rs.getString("cp"));
             d.setEstado(rs.getString("estado"));
             d.setCiudad(rs.getString("ciudad"));
-            //UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
+            d.setUsuarioId(rs.getObject("usuarios_id", UUID.class));
             d.setPreferido(rs.getBoolean("preferido"));
 
             return d;
@@ -45,10 +45,11 @@ public class DomicilioRepository {
     }
 
     public Domicilio findById(UUID domicilio_id) {
-        String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE id = ?::uuid";
+        String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE id = :id AND activo = TRUE";
         
         try {
             return jdbc.sql(sql)
+                .param("id",domicilio_id)
                 .query((rs,rowNum) ->{
                     Domicilio d = new Domicilio();
                     d.setId(rs.getObject("id", java.util.UUID.class));
@@ -58,7 +59,7 @@ public class DomicilioRepository {
                     d.setCp(rs.getString("cp"));
                     d.setEstado(rs.getString("estado"));
                     d.setCiudad(rs.getString("ciudad"));
-                    //UUID usuarioId = rs.getObject("usuarios_id", java.util.UUID.class);
+                    d.setUsuarioId(rs.getObject("usuarios_id", UUID.class));
                     d.setPreferido(rs.getBoolean("preferido"));
 
                     return d;
@@ -103,7 +104,7 @@ public class DomicilioRepository {
         return nuevoDomicilio;
     }
 
-    public Domicilio update(DomicilioPutDTO domicilio) {
+    public Domicilio update(DomicilioPutDTO domicilio, UUID domicilioId) {
         
         String sql = "UPDATE domicilios SET "
                 + "calle = :calle, "
@@ -113,7 +114,7 @@ public class DomicilioRepository {
                 + "estado = :estado, "
                 + "ciudad = :ciudad, "
                 + "preferido = :preferido "
-                + "WHERE id = :id";
+                + "WHERE id = :id AND activo=TRUE";
 
         int rowsAffected = jdbc.sql(sql)
             .param("calle", domicilio.getCalle())
@@ -123,19 +124,19 @@ public class DomicilioRepository {
             .param("estado", domicilio.getEstado())
             .param("ciudad", domicilio.getCiudad())
             .param("preferido", domicilio.isPreferido())
-            .param("id",domicilio.getId())
+            .param("id",domicilioId)
             .update();
             
         if (rowsAffected == 0) {
             return null;
         }
 
-        Domicilio domicilioActualizado = this.findById(domicilio.getId());
+        Domicilio domicilioActualizado = this.findById(domicilioId);
         return domicilioActualizado;
     }
 
     public int deactivateById(UUID domicilio_id) {
-        String sql = "UPDATE domicilios SET activo=FALSE WHERE id = :id";
+        String sql = "UPDATE domicilios SET activo=FALSE WHERE id = :id AND activo = TRUE";
         int rowsAffected = jdbc.sql(sql)
             .param("id",domicilio_id)
             .update();

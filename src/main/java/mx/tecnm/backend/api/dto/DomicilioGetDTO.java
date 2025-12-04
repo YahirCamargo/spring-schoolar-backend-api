@@ -1,6 +1,9 @@
 package mx.tecnm.backend.api.dto;
 
-public class DomicilioPutDTO {
+import java.util.UUID;
+
+public class DomicilioGetDTO {
+    private final UUID id;
     private final String calle;
     private final String numero;
     private final String colonia;
@@ -8,8 +11,10 @@ public class DomicilioPutDTO {
     private final String estado;
     private final String ciudad;
     private final boolean preferido;
+    private final UUID usuariosId;
 
-    public DomicilioPutDTO(String calle, String numero, String colonia, String cp, String estado, String ciudad, boolean preferido){
+    public DomicilioGetDTO(UUID id, String calle, String numero, String colonia, String cp, String estado, String ciudad, boolean preferido, UUID usuariosId){
+        this.id = id;
         this.calle = calle;
         this.numero = numero;
         this.colonia = colonia;
@@ -17,8 +22,10 @@ public class DomicilioPutDTO {
         this.estado = estado;
         this.ciudad = ciudad;
         this.preferido = preferido;
+        this.usuariosId = usuariosId;
     }
 
+    public UUID getId() { return id; }
     public String getCalle() { return calle; }
     public String getNumero() { return numero; }
     public String getColonia() { return colonia; }
@@ -26,4 +33,5 @@ public class DomicilioPutDTO {
     public String getEstado() { return estado; }
     public String getCiudad() { return ciudad; }
     public boolean isPreferido() { return preferido; }
+    public UUID getUsuariosId() { return usuariosId; }
 }

@@ -14,6 +14,7 @@ public class Producto {
     private BigDecimal alto;
     private BigDecimal ancho;
     private BigDecimal profundidad;
+    private UUID categoriasId;
     private boolean activo;
 
     public UUID getId() { return id; }
@@ -32,19 +33,19 @@ public class Producto {
     public void setColor(String color) { this.color = color; }
 
     public String getMarca() { return marca; }
-    public void setMarca(String marca) { this.sku = marca; }
+    public void setMarca(String marca) { this.marca = marca; }
     
     public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.sku = descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
     public BigDecimal getPeso() { return peso; }
-    public void setPeso(BigDecimal peso) { this.precio = peso; } 
+    public void setPeso(BigDecimal peso) { this.peso = peso; } 
 
     public BigDecimal getAlto() { return alto; }
     public void setAlto(BigDecimal alto) { this.alto = alto; } 
 
     public BigDecimal getAncho() { return ancho; }
-    public void setAncho(BigDecimal ancho) { this.precio = ancho; } 
+    public void setAncho(BigDecimal ancho) { this.ancho = ancho; } 
 
     public BigDecimal getProfundidad() { return profundidad; }
     public void setProfundidad(BigDecimal profundidad) { this.profundidad = profundidad; } 
@@ -52,5 +53,7 @@ public class Producto {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo =  activo; }
 
+    public UUID getCategoriasId() { return categoriasId; }
+    public void setCategoriasId(UUID categoriasId) { this.categoriasId = categoriasId; }
     
 }

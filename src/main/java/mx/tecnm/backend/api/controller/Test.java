@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import mx.tecnm.backend.api.model.Product;
 
-@RequestMapping("/test")
+@RequestMapping("/tests")
 @RestController
 public class Test {
 

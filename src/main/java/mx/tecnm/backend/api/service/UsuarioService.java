@@ -38,8 +38,8 @@ public class UsuarioService {
         return this.toDTO(usuarioGuardado);
     }
 
-    public UsuarioDTO actualizarPut(UsuarioPutDTO usuario){
-        Usuario usuarioAActualizar = userRepo.update(usuario);
+    public UsuarioDTO actualizarPut(UsuarioPutDTO usuario, UUID usuarioId){
+        Usuario usuarioAActualizar = userRepo.update(usuario, usuarioId);
         if (usuarioAActualizar == null){
             return null;
         }
