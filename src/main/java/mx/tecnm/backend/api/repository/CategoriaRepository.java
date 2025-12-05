@@ -64,6 +64,7 @@ public class CategoriaRepository {
         return nueva;
     }
 
+
     public Categoria update(CategoriaPostDTO categoria, UUID categoriaId) {
         String sql = """
                 UPDATE categorias SET
