@@ -6,48 +6,50 @@ import java.util.UUID;
 import mx.tecnm.backend.api.model.Usuario;
 import mx.tecnm.backend.api.dto.UsuarioDTO;
 import mx.tecnm.backend.api.dto.UsuarioPutDTO;
+import mx.tecnm.backend.api.exception.UsuarioNoEncontradoException;
 import mx.tecnm.backend.api.dto.UsuarioPostDTO;
 import mx.tecnm.backend.api.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
 
-    private final UsuarioRepository userRepo;
+    private final UsuarioRepository uRepo;
 
-    public UsuarioService(UsuarioRepository userRepo) {
-        this.userRepo = userRepo;
+    public UsuarioService(UsuarioRepository uRepo) {
+        this.uRepo = uRepo;
     }
 
     public List<UsuarioDTO> listar() {
-        return userRepo.findAll()
+        return uRepo.findAll()
             .stream()
             .map(this::toDTO)
             .toList();
     }
 
-    public UsuarioDTO obtenerPorId(UUID usuario_id) {
-        Usuario usuario = userRepo.findById(usuario_id);
-        if (usuario == null){
-            return null;
-        }
+    public UsuarioDTO obtenerPorId(UUID usuarioId) {
+        Usuario usuario = uRepo.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNoEncontradoException(usuarioId));
+
         return this.toDTO(usuario);
     }
 
     public UsuarioDTO guardar(UsuarioPostDTO usuarioACrear){
-        Usuario usuarioGuardado = userRepo.save(usuarioACrear);
+        Usuario usuarioGuardado = uRepo.save(usuarioACrear);
         return this.toDTO(usuarioGuardado);
     }
 
-    public UsuarioDTO actualizarPut(UsuarioPutDTO usuario, UUID usuarioId){
-        Usuario usuarioAActualizar = userRepo.update(usuario, usuarioId);
-        if (usuarioAActualizar == null){
-            return null;
-        }
-        return this.toDTO(usuarioAActualizar);
+    public UsuarioDTO actualizarPut(UsuarioPutDTO usuarioAActualizar, UUID usuarioId){
+        Usuario usuarioActualizado = uRepo.update(usuarioAActualizar, usuarioId)
+                .orElseThrow(() -> new UsuarioNoEncontradoException(usuarioId));
+        
+        return this.toDTO(usuarioActualizado);
     }
 
-    public int eliminar(UUID usuario_id){
-        return userRepo.deactivateById(usuario_id);
+    public void eliminar(UUID usuarioId){
+        int rows = uRepo.deactivateById(usuarioId);
+        if(rows == 0){
+            throw new UsuarioNoEncontradoException(usuarioId);
+        }
     }
 
     private UsuarioDTO toDTO(Usuario u) {

@@ -1,10 +1,10 @@
 package mx.tecnm.backend.api.repository;
 
-
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,6 +19,7 @@ public class MetodoPagoRepository {
     public MetodoPagoRepository(JdbcClient jdbc) {
         this.jdbc = jdbc;
     }
+    
     public List<MetodoPago> findAll() {
         String sql = "SELECT id,nombre,comision FROM metodos_pago WHERE activo=TRUE";
 
@@ -34,11 +35,11 @@ public class MetodoPagoRepository {
 
     }
 
-    public MetodoPago findById(UUID metodo_pago_id) {
+    public Optional<MetodoPago> findById(UUID metodoPagoId) {
         String sql = "SELECT id,nombre,comision FROM metodos_pago WHERE id = :id AND activo = TRUE";
     
         try {
-            return jdbc.sql(sql).param("id",metodo_pago_id)
+            MetodoPago metodoPago = jdbc.sql(sql).param("id",metodoPagoId)
                         .query((rs, rowNum) -> {
                             MetodoPago mP = new MetodoPago();
                             mP.setId(rs.getObject("id", UUID.class));
@@ -47,9 +48,9 @@ public class MetodoPagoRepository {
                             return mP;
                         })
                         .single();
-            
+            return Optional.of(metodoPago);
         } catch (EmptyResultDataAccessException e) {
-            return null; 
+            return Optional.empty(); 
         }
     }
 
@@ -70,7 +71,7 @@ public class MetodoPagoRepository {
         return nueva;
     }
 
-    public MetodoPago update(MetodoPagoPostDTO metodoPago, UUID metodoPagoId) {
+    public Optional<MetodoPago> update(MetodoPagoPostDTO metodoPagoAActualizar, UUID metodoPagoId) {
         
         String sql = "UPDATE metodos_pago SET "
                 + "nombre = :nombre, "
@@ -78,21 +79,21 @@ public class MetodoPagoRepository {
                 + "WHERE id = :id AND activo=TRUE";
 
         int rowsAffected = jdbc.sql(sql)
-                .param("nombre", metodoPago.getNombre())
-                .param("comision", metodoPago.getComision())
+                .param("nombre", metodoPagoAActualizar.getNombre())
+                .param("comision", metodoPagoAActualizar.getComision())
                 .param("id", metodoPagoId)
                 .update();
 
-        if (rowsAffected == 0) return null;
+        if (rowsAffected == 0) return Optional.empty();
 
         return findById(metodoPagoId);
     }
 
-    public int deleteById(UUID metodo_pago_id) {
+    public int deleteById(UUID metodoPagoId) {
         String sql = "UPDATE metodos_pago SET activo=FALSE WHERE id = :id AND activo=TRUE";
 
         return jdbc.sql(sql)
-                .param("id", metodo_pago_id)
+                .param("id", metodoPagoId)
                 .update();
     }
 }

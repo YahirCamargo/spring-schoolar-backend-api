@@ -7,13 +7,15 @@ import java.util.List;
 import java.net.URI;
 import java.util.UUID;
 
-import mx.tecnm.backend.api.dto.DomicilioGetDTO;
+import mx.tecnm.backend.api.model.Domicilio;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
+import mx.tecnm.backend.api.dto.DomicilioPutDTO;
 import mx.tecnm.backend.api.service.DomicilioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-@Tag(name = "Direcciones", description = "Endpoints para la gestión de direcciones.")
+
+@Tag(name = "Domicilios", description = "Endpoints para la gestión de domicilios.")
 @RestController
-@RequestMapping("/api/direcciones")
+@RequestMapping("/api/domicilios")
 @CrossOrigin(origins = "*")
 public class DomicilioController {
     private final DomicilioService service;
@@ -23,23 +25,18 @@ public class DomicilioController {
     }
 
     @GetMapping
-    public List<DomicilioGetDTO> listar() {
+    public List<Domicilio> listar() {
         return service.listar();
     }
 
-    @GetMapping("/{direccionId}")
-    public ResponseEntity<DomicilioGetDTO> obtenerPorId(@PathVariable UUID direccionId) {
-        DomicilioGetDTO domicilio = service.obtenerPorId(direccionId);
-        
-        if (domicilio == null) {
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(domicilio); 
+    @GetMapping("/{id}")
+    public ResponseEntity<Domicilio> obtenerPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.obtenerPorId(id)); 
     }
 
     @PostMapping
-    public ResponseEntity<DomicilioGetDTO> crear(@RequestBody DomicilioPostDTO domicilio){
-        DomicilioGetDTO domicilioACrear = service.guardar(domicilio);
+    public ResponseEntity<Domicilio> crear(@RequestBody DomicilioPostDTO domicilio){
+        Domicilio domicilioACrear = service.guardar(domicilio);
         URI ubicacion = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -48,12 +45,14 @@ public class DomicilioController {
         return ResponseEntity.created(ubicacion).body(domicilioACrear);
     }
 
-    @DeleteMapping("/{direccionId}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID direccionId){
-        int columnasAfectadas = service.eliminar(direccionId);
-        if(columnasAfectadas == 0){
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<Domicilio> actualizar(@PathVariable UUID id, @RequestBody DomicilioPutDTO domicilio) {
+        return ResponseEntity.ok(service.actualizar(domicilio, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
+        service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

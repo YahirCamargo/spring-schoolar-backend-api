@@ -15,7 +15,6 @@ public class Producto {
     private BigDecimal ancho;
     private BigDecimal profundidad;
     private UUID categoriasId;
-    private boolean activo;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -48,10 +47,7 @@ public class Producto {
     public void setAncho(BigDecimal ancho) { this.ancho = ancho; } 
 
     public BigDecimal getProfundidad() { return profundidad; }
-    public void setProfundidad(BigDecimal profundidad) { this.profundidad = profundidad; } 
-
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo =  activo; }
+    public void setProfundidad(BigDecimal profundidad) { this.profundidad = profundidad; }
 
     public UUID getCategoriasId() { return categoriasId; }
     public void setCategoriasId(UUID categoriasId) { this.categoriasId = categoriasId; }

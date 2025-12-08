@@ -1,72 +1,71 @@
 package mx.tecnm.backend.api.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.Domicilio;
-import mx.tecnm.backend.api.dto.DomicilioGetDTO;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
+import mx.tecnm.backend.api.dto.DomicilioPutDTO;
+import mx.tecnm.backend.api.exception.DomicilioNoEncontradoException;
+import mx.tecnm.backend.api.exception.UsuarioNoEncontradoException;
 import mx.tecnm.backend.api.repository.DomicilioRepository;
+import mx.tecnm.backend.api.repository.UsuarioRepository;
 
 @Service
 public class DomicilioService {
     private final DomicilioRepository dRepo;
+    private final UsuarioRepository uRepo;
 
-    public DomicilioService(DomicilioRepository dRepo) {
+    public DomicilioService(DomicilioRepository dRepo,UsuarioRepository uRepo) {
         this.dRepo = dRepo;
+        this.uRepo = uRepo;
     }
 
-    public List<DomicilioGetDTO> listar() {
+    public List<Domicilio> listar() {
         return dRepo.findAll()
             .stream()
-            .map(this::toDTO)
             .toList();
     }
 
-    public DomicilioGetDTO obtenerPorId(UUID domicilio_id) {
-        Domicilio domicilio = dRepo.findById(domicilio_id);
-        if (domicilio == null){
-            return null;
-        }
-        return this.toDTO(domicilio);
+    public Domicilio obtenerPorId(UUID domicilioId) {
+        return dRepo.findById(domicilioId)
+        .orElseThrow(() -> new DomicilioNoEncontradoException(domicilioId));
     }
 
-    public DomicilioGetDTO guardar(DomicilioPostDTO domicilioACrear){
-        if(domicilioACrear.getPreferido() == true){
+    @Transactional
+    public Domicilio guardar(DomicilioPostDTO domicilioACrear){
+        uRepo.findById(domicilioACrear.getUsuarioId())
+                .orElseThrow(() -> new UsuarioNoEncontradoException(domicilioACrear.getUsuarioId()));
+
+        if(domicilioACrear.isPreferido()){
             dRepo.unsetPreferredByUserId(domicilioACrear.getUsuarioId());
         }
+
         Domicilio domicilioGuardado = dRepo.save(domicilioACrear);
-        return this.toDTO(domicilioGuardado);
+        return domicilioGuardado;
+    }
+
+    @Transactional
+    public Domicilio actualizar(DomicilioPutDTO domicilioAActualizar, UUID domicilioId){
+        Domicilio domicilio = dRepo.findById(domicilioId)
+            .orElseThrow(() -> new DomicilioNoEncontradoException(domicilioId));;
+
+        if(domicilioAActualizar.isPreferido()){
+            dRepo.unsetPreferredByUserId(domicilio.getUsuarioId());
+        }
+
+        Domicilio domicilioActualizado = dRepo.update(domicilioAActualizar, domicilioId)
+            .orElseThrow(() -> new DomicilioNoEncontradoException(domicilioId));
+        return domicilioActualizado;
     }
 
 
-    public int eliminar(UUID domicilio_id){
-        return dRepo.deactivateById(domicilio_id);
+    public void eliminar(UUID domicilioId){
+        int rows = dRepo.deactivateById(domicilioId);
+        if(rows == 0){
+            throw new DomicilioNoEncontradoException(domicilioId);
+        }
     }
-
-    private DomicilioGetDTO toDTO(Domicilio d) {
-        return new DomicilioGetDTO(
-                d.getId(),
-                d.getCalle(),
-                d.getNumero(),
-                d.getColonia(),
-                d.getCp(),
-                d.getEstado(),
-                d.getCiudad(),
-                d.isPreferido(),
-                d.getUsuarioId()
-        );
-    }
-
-    /*
-    private final UUID id;
-    private final String calle;
-    private final String numero;
-    private final String colonia;
-    private final String cp;
-    private final String estado;
-    private final String ciudad;
-    private final boolean preferido;
-    private final UUID usuariosId; 
-    */
 }

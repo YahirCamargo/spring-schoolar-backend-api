@@ -3,8 +3,10 @@ package mx.tecnm.backend.api.repository;
 import mx.tecnm.backend.api.model.Domicilio;
 import mx.tecnm.backend.api.dto.DomicilioPostDTO;
 import mx.tecnm.backend.api.dto.DomicilioPutDTO;
+
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -44,12 +46,12 @@ public class DomicilioRepository {
         }
     }
 
-    public Domicilio findById(UUID domicilio_id) {
+    public Optional<Domicilio> findById(UUID domicilioId) {
         String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE id = :id AND activo = TRUE";
         
         try {
-            return jdbc.sql(sql)
-                .param("id",domicilio_id)
+            Domicilio domicilio = jdbc.sql(sql)
+                .param("id",domicilioId)
                 .query((rs,rowNum) ->{
                     Domicilio d = new Domicilio();
                     d.setId(rs.getObject("id", java.util.UUID.class));
@@ -64,11 +66,41 @@ public class DomicilioRepository {
 
                     return d;
                 }).single();
-            
+
+            return Optional.of(domicilio);
+
         } catch (EmptyResultDataAccessException e) {
-            return null; 
+            return Optional.empty();
         }
     }
+
+    public Optional<Domicilio> findPreferidoByUsuarioId(UUID usuarioId) {
+        String sql = "SELECT id, calle, numero, colonia, cp, estado, ciudad, usuarios_id, preferido FROM domicilios WHERE usuarios_id = :usuario_id AND preferido=TRUE AND activo = TRUE";
+        
+        try {
+            Domicilio domicilio = jdbc.sql(sql)
+                .param("usuario_id",usuarioId)
+                .query((rs,rowNum) ->{
+                    Domicilio d = new Domicilio();
+                    d.setId(rs.getObject("id", java.util.UUID.class));
+                    d.setCalle(rs.getString("calle"));
+                    d.setNumero(rs.getString("numero"));
+                    d.setColonia(rs.getString("colonia"));
+                    d.setCp(rs.getString("cp"));
+                    d.setEstado(rs.getString("estado"));
+                    d.setCiudad(rs.getString("ciudad"));
+                    d.setUsuarioId(rs.getObject("usuarios_id", UUID.class));
+                    d.setPreferido(rs.getBoolean("preferido"));
+
+                    return d;
+                }).single();
+            return Optional.of(domicilio);
+
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
 
     public Domicilio save(DomicilioPostDTO domicilioACrear) {
 
@@ -85,12 +117,12 @@ public class DomicilioRepository {
             .param("estado", domicilioACrear.getEstado())
             .param("ciudad", domicilioACrear.getCiudad())
             .param("usuarios_id", domicilioACrear.getUsuarioId())
-            .param("preferido", domicilioACrear.getPreferido())
+            .param("preferido", domicilioACrear.isPreferido())
             .query((rs,rowNum)-> rs.getObject("id",UUID.class))
             .single();
 
 
-        Domicilio nuevoDomicilio = findById(generatedId);
+        Domicilio nuevoDomicilio = new Domicilio();
 
         nuevoDomicilio.setId(generatedId);
         nuevoDomicilio.setCalle(domicilioACrear.getCalle());
@@ -99,12 +131,13 @@ public class DomicilioRepository {
         nuevoDomicilio.setCp(domicilioACrear.getCp());
         nuevoDomicilio.setEstado(domicilioACrear.getEstado());
         nuevoDomicilio.setCiudad(domicilioACrear.getCiudad());
-        nuevoDomicilio.setPreferido(domicilioACrear.getPreferido());
+        nuevoDomicilio.setUsuarioId(domicilioACrear.getUsuarioId());
+        nuevoDomicilio.setPreferido(domicilioACrear.isPreferido());
         
         return nuevoDomicilio;
     }
 
-    public Domicilio update(DomicilioPutDTO domicilio, UUID domicilioId) {
+    public Optional<Domicilio> update(DomicilioPutDTO domicilioAActualizar, UUID domicilioId) {
         
         String sql = "UPDATE domicilios SET "
                 + "calle = :calle, "
@@ -117,36 +150,35 @@ public class DomicilioRepository {
                 + "WHERE id = :id AND activo=TRUE";
 
         int rowsAffected = jdbc.sql(sql)
-            .param("calle", domicilio.getCalle())
-            .param("numero", domicilio.getNumero())
-            .param("colonia", domicilio.getColonia())
-            .param("cp", domicilio.getCp())
-            .param("estado", domicilio.getEstado())
-            .param("ciudad", domicilio.getCiudad())
-            .param("preferido", domicilio.isPreferido())
+            .param("calle", domicilioAActualizar.getCalle())
+            .param("numero", domicilioAActualizar.getNumero())
+            .param("colonia", domicilioAActualizar.getColonia())
+            .param("cp", domicilioAActualizar.getCp())
+            .param("estado", domicilioAActualizar.getEstado())
+            .param("ciudad", domicilioAActualizar.getCiudad())
+            .param("preferido", domicilioAActualizar.isPreferido())
             .param("id",domicilioId)
             .update();
             
         if (rowsAffected == 0) {
-            return null;
+            return Optional.empty();
         }
 
-        Domicilio domicilioActualizado = this.findById(domicilioId);
-        return domicilioActualizado;
+        return findById(domicilioId);
     }
 
-    public int deactivateById(UUID domicilio_id) {
+    public int deactivateById(UUID domicilioId) {
         String sql = "UPDATE domicilios SET activo=FALSE WHERE id = :id AND activo = TRUE";
         int rowsAffected = jdbc.sql(sql)
-            .param("id",domicilio_id)
+            .param("id",domicilioId)
             .update();
         return rowsAffected;
     }
 
-    public int unsetPreferredByUserId(UUID domicilio_id) {
+    public int unsetPreferredByUserId(UUID domicilioId) {
         String sql = "UPDATE domicilios SET preferido = FALSE WHERE usuarios_id = :id AND preferido = TRUE";
 
         return jdbc.sql(sql)
-            .param("id",domicilio_id).update();
+            .param("id",domicilioId).update();
     }
 }

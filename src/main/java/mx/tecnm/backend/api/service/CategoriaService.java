@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.Categoria;
-import mx.tecnm.backend.api.dto.CategoriaGetDTO;
 import mx.tecnm.backend.api.dto.CategoriaPostDTO;
+import mx.tecnm.backend.api.exception.CategoriaNoEncontradaException;
 import mx.tecnm.backend.api.repository.CategoriaRepository;
 
 @Service
@@ -16,42 +16,32 @@ public class CategoriaService {
         this.cRepo = cRepo;
     }
 
-    public List<CategoriaGetDTO> listar() {
+    public List<Categoria> listar() {
         return cRepo.findAll()
             .stream()
-            .map(this::toDTO)
             .toList();
     }
 
-    public CategoriaGetDTO obtenerPorId(UUID categoria_id) {
-        Categoria categoria = cRepo.findById(categoria_id);
-        if (categoria == null){
-            return null;
-        }
-        return this.toDTO(categoria);
+    public Categoria obtenerPorId(UUID categoriaId) {
+        return cRepo.findById(categoriaId)
+            .orElseThrow(() -> new CategoriaNoEncontradaException(categoriaId));
     }
 
-    public CategoriaGetDTO guardar(CategoriaPostDTO categoriaACrear){
+    public Categoria guardar(CategoriaPostDTO categoriaACrear){
         Categoria categoriaGuardado = cRepo.save(categoriaACrear);
-        return this.toDTO(categoriaGuardado);
+        return categoriaGuardado;
     }
 
-    public CategoriaGetDTO actualizarPut(CategoriaPostDTO categoria, UUID categoriaId){
-        Categoria categoriaAActualizar = cRepo.update(categoria, categoriaId);
-        if (categoriaAActualizar == null){
-            return null;
+    public Categoria actualizarPut(CategoriaPostDTO categoriaAActualizar, UUID categoriaId){
+        return cRepo.update(categoriaAActualizar, categoriaId)
+        .orElseThrow(() -> new CategoriaNoEncontradaException(categoriaId));
+    }
+
+    public void eliminar(UUID categoriaId){
+        int rows = cRepo.deactivateById(categoriaId);
+        if(rows == 0){
+            throw new CategoriaNoEncontradaException(categoriaId);
         }
-        return this.toDTO(categoriaAActualizar);
     }
 
-    public int eliminar(UUID categoria_id){
-        return cRepo.deactivateById(categoria_id);
-    }
-
-    private CategoriaGetDTO toDTO(Categoria c) {
-        return new CategoriaGetDTO(
-                c.getId(),
-                c.getNombre()
-        );
-    }
 }

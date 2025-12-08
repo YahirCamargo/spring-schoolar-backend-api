@@ -2,8 +2,10 @@ package mx.tecnm.backend.api.repository;
 
 import mx.tecnm.backend.api.model.Categoria;
 import mx.tecnm.backend.api.dto.CategoriaPostDTO;
+
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -31,23 +33,27 @@ public class CategoriaRepository {
                 .list();
     }
 
-    public Categoria findById(UUID categoriaId) {
+   public Optional<Categoria> findById(UUID categoriaId) {
         String sql = "SELECT id, nombre FROM categorias WHERE id = :id AND activo=TRUE";
 
         try {
-            return jdbc.sql(sql)
-                    .param("id", categoriaId)
-                    .query((rs, rowNum) -> {
-                        Categoria c = new Categoria();
-                        c.setId(rs.getObject("id", UUID.class));
-                        c.setNombre(rs.getString("nombre"));
-                        return c;
-                    })
-                    .single();
+            Categoria categoria = jdbc.sql(sql)
+                .param("id", categoriaId)
+                .query((rs, rowNum) -> {
+                    Categoria c = new Categoria();
+                    c.setId(rs.getObject("id", UUID.class));
+                    c.setNombre(rs.getString("nombre"));
+                    return c;
+                })
+                .single();
+
+            return Optional.of(categoria);
+
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            return Optional.empty();
         }
     }
+
 
     public Categoria save(CategoriaPostDTO categoriaACrear) {
         String sql = "INSERT INTO categorias (nombre) VALUES (:nombre) RETURNING id";
@@ -65,7 +71,7 @@ public class CategoriaRepository {
     }
 
 
-    public Categoria update(CategoriaPostDTO categoria, UUID categoriaId) {
+    public Optional<Categoria> update(CategoriaPostDTO categoriaAActulizar, UUID categoriaId) {
         String sql = """
                 UPDATE categorias SET
                     nombre = :nombre
@@ -73,14 +79,17 @@ public class CategoriaRepository {
                 """;
 
         int rowsAffected = jdbc.sql(sql)
-                .param("nombre", categoria.getNombre())
+                .param("nombre", categoriaAActulizar.getNombre())
                 .param("id", categoriaId)
                 .update();
 
-        if (rowsAffected == 0) return null;
+        if (rowsAffected == 0) {
+            return Optional.empty();
+        }
 
         return findById(categoriaId);
     }
+
 
     public int deactivateById(UUID id) {
         String sql = "UPDATE categorias SET activo=FALSE WHERE id = :id AND activo=TRUE";

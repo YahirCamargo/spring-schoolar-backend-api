@@ -6,10 +6,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.net.URI;
 import java.util.UUID;
-import mx.tecnm.backend.api.dto.CategoriaGetDTO;
+import mx.tecnm.backend.api.model.Categoria;
 import mx.tecnm.backend.api.dto.CategoriaPostDTO;
 import mx.tecnm.backend.api.service.CategoriaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Tag(name = "Categorías", description = "Endpoints para la gestión de categorias.")
 @RestController
 @RequestMapping("/api/categorias")
@@ -22,23 +23,18 @@ public class CategoriaController {
     }
 
     @GetMapping
-    public List<CategoriaGetDTO> listar() {
+    public List<Categoria> listar() {
         return service.listar();
     }
 
-    @GetMapping("/{categoriaId}")
-    public ResponseEntity<CategoriaGetDTO> obtenerPorId(@PathVariable UUID categoriaId) {
-        CategoriaGetDTO categoria = service.obtenerPorId(categoriaId);
-        
-        if (categoria == null) {
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(categoria); 
+    @GetMapping("/{id}")
+    public ResponseEntity<Categoria> obtenerPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.obtenerPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaGetDTO> crear(@RequestBody CategoriaPostDTO categoria){
-        CategoriaGetDTO categoriaACrear = service.guardar(categoria);
+    public ResponseEntity<Categoria> crear(@RequestBody CategoriaPostDTO categoria){
+        Categoria categoriaACrear = service.guardar(categoria);
         URI ubicacion = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -47,21 +43,14 @@ public class CategoriaController {
         return ResponseEntity.created(ubicacion).body(categoriaACrear);
     }
 
-    @PutMapping("/{categoriaId}")
-    public ResponseEntity<CategoriaGetDTO> actualizar(@PathVariable UUID categoriaId, @RequestBody CategoriaPostDTO categoria){
-        CategoriaGetDTO categoriaAActualizar = service.actualizarPut(categoria,categoriaId);
-        if(categoriaAActualizar == null){
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(categoriaAActualizar);
+    @PutMapping("/{id}")
+    public ResponseEntity<Categoria> actualizar(@PathVariable UUID id, @RequestBody CategoriaPostDTO categoria){
+        return ResponseEntity.ok(service.actualizarPut(categoria,id));
     }
 
-    @DeleteMapping("/{categoriaId}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID categoriaId){
-        int columnasAfectadas = service.eliminar(categoriaId);
-        if(columnasAfectadas == 0){
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
+        service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,7 +7,6 @@ public class MetodoPago {
     private UUID id;
     private String nombre;
     private BigDecimal comision;
-    private boolean activo;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -17,7 +16,4 @@ public class MetodoPago {
 
     public BigDecimal getComision() { return comision; }
     public void setComision(BigDecimal comision) { this.comision = comision; }
-
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo =  activo; }
 }

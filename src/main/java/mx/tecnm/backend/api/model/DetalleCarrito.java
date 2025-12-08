@@ -22,6 +22,6 @@ public class DetalleCarrito {
     public UUID getProductosId() { return productosId; }
     public void setProductosId(UUID productosId) {  this.productosId = productosId; }
 
-    public UUID getUsuariosId() {return usuariosId;}
+    public UUID getUsuariosId() { return usuariosId;}
     public void setUsuariosId(UUID usuariosId) { this.usuariosId = usuariosId; }
 }

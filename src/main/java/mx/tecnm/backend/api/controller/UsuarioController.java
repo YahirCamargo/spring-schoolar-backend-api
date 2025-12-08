@@ -27,14 +27,9 @@ public class UsuarioController {
         return service.listar();
     }
 
-    @GetMapping("/{usuarioId}")
-    public ResponseEntity<UsuarioDTO> obtenerPorId(@PathVariable UUID usuarioId) {
-        UsuarioDTO usuario = service.obtenerPorId(usuarioId);
-        
-        if (usuario == null) {
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(usuario); 
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioDTO> obtenerPorId(@PathVariable UUID id) {        
+        return ResponseEntity.ok(service.obtenerPorId(id)); 
     }
 
     @PostMapping
@@ -48,21 +43,14 @@ public class UsuarioController {
         return ResponseEntity.created(ubicacion).body(usuarioACrear);
     }
 
-    @PutMapping("/{usuarioId}")
-    public ResponseEntity<UsuarioDTO> actualizar(@PathVariable UUID usuarioId, @RequestBody UsuarioPutDTO user){
-        UsuarioDTO usuarioAActualizar = service.actualizarPut(user,usuarioId);
-        if(usuarioAActualizar == null){
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(usuarioAActualizar);
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioDTO> actualizar(@PathVariable UUID id, @RequestBody UsuarioPutDTO user){
+        return ResponseEntity.ok(service.actualizarPut(user,id));
     }
 
-    @DeleteMapping("/{usuarioId}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID usuarioId){
-        int columnasAfectadas = service.eliminar(usuarioId);
-        if(columnasAfectadas == 0){
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id){
+        service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 

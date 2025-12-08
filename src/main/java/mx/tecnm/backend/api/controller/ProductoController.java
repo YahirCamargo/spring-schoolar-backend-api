@@ -6,9 +6,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.net.URI;
 import java.util.UUID;
-
+import mx.tecnm.backend.api.model.Producto;
 import mx.tecnm.backend.api.dto.ProductoPutDTO;
-import mx.tecnm.backend.api.dto.ProductoGetDTO;
 import mx.tecnm.backend.api.dto.ProductoPostDTO;
 import mx.tecnm.backend.api.service.ProductoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,24 +24,19 @@ public class ProductoController {
     }
 
     @GetMapping
-    public List<ProductoGetDTO> listar() {
+    public List<Producto> listar() {
         return service.listar();
     }
 
-    @GetMapping("/{productoId}")
-    public ResponseEntity<ProductoGetDTO> obtenerPorId(@PathVariable UUID productoId) {
-        ProductoGetDTO producto = service.obtenerPorId(productoId);
-        
-        if (producto == null) {
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(producto); 
+    @GetMapping("/{id}")
+    public ResponseEntity<Producto> obtenerPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.obtenerPorId(id)); 
     }
 
 
     @PostMapping
-    public ResponseEntity<ProductoGetDTO> crear(@RequestBody ProductoPostDTO producto){
-        ProductoGetDTO productoACrear = service.guardar(producto);
+    public ResponseEntity<Producto> crear(@RequestBody ProductoPostDTO producto){
+        Producto productoACrear = service.guardar(producto);
         URI ubicacion = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -51,21 +45,14 @@ public class ProductoController {
         return ResponseEntity.created(ubicacion).body(productoACrear);
     }
 
-    @PutMapping("/{productoId}")
-    public ResponseEntity<ProductoGetDTO> actualizar(@PathVariable UUID productoId,@RequestBody ProductoPutDTO producto){
-        ProductoGetDTO productoAActualizar = service.actualizarPut(producto,productoId);
-        if(productoAActualizar == null){
-            return ResponseEntity.notFound().build(); 
-        }
-        return ResponseEntity.ok(productoAActualizar);
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> actualizar(@PathVariable UUID id,@RequestBody ProductoPutDTO producto){
+        return ResponseEntity.ok(service.actualizarPut(producto,id));
     }
 
-    @DeleteMapping("/{productoId}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID productoId){
-        int columnasAfectadas = service.eliminar(productoId);
-        if(columnasAfectadas == 0){
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id){
+        service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -28,6 +28,6 @@ public class DomicilioPostDTO {
     public String getCp() { return cp; }
     public String getEstado() { return estado; }
     public String getCiudad() { return ciudad; }
-    public boolean getPreferido() { return preferido; }
+    public boolean isPreferido() { return preferido; }
     public UUID getUsuarioId() { return usuarioId; }
 }

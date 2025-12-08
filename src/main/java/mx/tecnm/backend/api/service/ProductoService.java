@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 import mx.tecnm.backend.api.dto.ProductoPutDTO;
-import mx.tecnm.backend.api.dto.ProductoGetDTO;
 import mx.tecnm.backend.api.dto.ProductoPostDTO;
 import mx.tecnm.backend.api.model.Producto;
 import mx.tecnm.backend.api.repository.ProductoRepository;
+import mx.tecnm.backend.api.exception.ProductoNoEncontradoException;
 
 @Service
 public class ProductoService {
@@ -18,54 +18,32 @@ public class ProductoService {
         this.pRepo = pRepo;
     }
 
-    public List<ProductoGetDTO> listar() {
+    public List<Producto> listar() {
         return pRepo.findAll()
             .stream()
-            .map(this::toDTO)
             .toList();
     }
 
-    public ProductoGetDTO obtenerPorId(UUID producto_id) {
-        Producto producto = pRepo.findById(producto_id);
-        if (producto == null){
-            return null;
-        }
-        return this.toDTO(producto);
+    public Producto obtenerPorId(UUID productoId) {
+        return pRepo.findById(productoId)
+                .orElseThrow(() -> new ProductoNoEncontradoException(productoId));
     }
 
-    public ProductoGetDTO guardar(ProductoPostDTO productoACrear){
+    public Producto guardar(ProductoPostDTO productoACrear){
         Producto productoGuardado = pRepo.save(productoACrear);
-        return this.toDTO(productoGuardado);
+        return productoGuardado;
     }
 
-    public ProductoGetDTO actualizarPut(ProductoPutDTO producto, UUID productoId){
-        Producto productoAActualizar = pRepo.update(producto,productoId);
-        if (productoAActualizar == null){
-            return null;
+    public Producto actualizarPut(ProductoPutDTO productoAActualizar, UUID productoId){
+        return pRepo.update(productoAActualizar,productoId)
+                .orElseThrow(()-> new ProductoNoEncontradoException(productoId));
+    }
+
+    public void eliminar(UUID productoId){
+        int rows = pRepo.deactivateById(productoId);
+        if(rows == 0 ){
+            throw new ProductoNoEncontradoException(productoId);
         }
-        return this.toDTO(productoAActualizar);
-    }
-
-    public int eliminar(UUID producto_id){
-        return pRepo.deactivateById(producto_id);
-    }
-
-
-    private ProductoGetDTO toDTO(Producto p){
-        return new ProductoGetDTO(
-            p.getId(), 
-            p.getNombre(), 
-            p.getPrecio(), 
-            p.getSku(), 
-            p.getColor(), 
-            p.getMarca(), 
-            p.getDescripcion(), 
-            p.getPeso(), 
-            p.getAlto(), 
-            p.getAncho(), 
-            p.getProfundidad(), 
-            p.getCategoriasId()
-        );
     }
     
 }

@@ -5,7 +5,9 @@ import mx.tecnm.backend.api.dto.ProductoPostDTO;
 import mx.tecnm.backend.api.model.Producto;
 
 import java.util.UUID;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -43,12 +45,12 @@ public class ProductoRepository {
                 .list();
     }
 
-    public Producto findById(UUID producto_id) {
+    public Optional<Producto> findById(UUID productoId) {
         String sql = "SELECT id,nombre,precio,sku,color,marca,descripcion,peso,alto,ancho,profundidad,categorias_id FROM productos WHERE activo=TRUE AND id = :id";
         
         try {
-            return jdbc.sql(sql)
-                .param("id",producto_id)
+            Producto producto = jdbc.sql(sql)
+                .param("id",productoId)
                 .query((rs, rowNum) -> {
                     Producto p = new Producto();
                     p.setId(rs.getObject("id",UUID.class));
@@ -65,8 +67,22 @@ public class ProductoRepository {
                     p.setCategoriasId(rs.getObject("categorias_id",UUID.class));
                     return p;
                 }).single();
+            return Optional.of(producto);
         }catch (EmptyResultDataAccessException e) {
-            return null; 
+            return Optional.empty(); 
+        }
+    }
+
+    public Optional<BigDecimal> findPrecioById(UUID productoId) {
+        String sql = "SELECT precio FROM productos WHERE id = :id AND activo = TRUE";
+        try {
+            BigDecimal precio = jdbc.sql(sql)
+                    .param("id", productoId)
+                    .query(BigDecimal.class)
+                    .single();
+            return Optional.of(precio);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
     }
 
@@ -108,7 +124,7 @@ public class ProductoRepository {
     }
 
 
-    public Producto update(ProductoPutDTO productoAActualizar,UUID productoId) {
+    public Optional<Producto> update(ProductoPutDTO productoAActualizar,UUID productoId) {
         String sql = """
             UPDATE productos SET
                 nombre = :nombre,
@@ -139,17 +155,17 @@ public class ProductoRepository {
                 .update();
 
         if (rows == 0) {
-            return null;
+            return Optional.empty();
         }
 
-        return this.findById(productoId);
+        return findById(productoId);
     }
 
 
-    public int deactivateById(UUID producto_id) {
+    public int deactivateById(UUID productoId) {
         String sql = "UPDATE productos SET activo=FALSE WHERE id = :id AND activo = TRUE";
         return jdbc.sql(sql)
-            .param("id",producto_id)
+            .param("id",productoId)
             .update();
     }
 }

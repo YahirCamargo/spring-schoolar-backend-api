@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import mx.tecnm.backend.api.model.MetodoPago;
 import mx.tecnm.backend.api.dto.MetodoPagoPostDTO;
-import mx.tecnm.backend.api.dto.MetodoPagoGetDTO;
+import mx.tecnm.backend.api.exception.MetodoPagoNoEncontradoException;
 import mx.tecnm.backend.api.repository.MetodoPagoRepository;
 
 @Service
@@ -16,19 +16,15 @@ public class MetodoPagoService {
         this.mpRepo = mpRepo;
     }
 
-    public List<MetodoPagoGetDTO> listar() {
+    public List<MetodoPago> listar() {
         return mpRepo.findAll()
             .stream()
-            .map(this::toDTO)
             .toList();
     }
 
-    public MetodoPagoGetDTO obtenerPorId(UUID metodo_pago_id) {
-        MetodoPago metodoPago = mpRepo.findById(metodo_pago_id);
-        if (metodoPago == null){
-            return null;
-        }
-        return this.toDTO(metodoPago);
+    public MetodoPago obtenerPorId(UUID metodoPagoId) {
+        return mpRepo.findById(metodoPagoId)
+                .orElseThrow(() -> new MetodoPagoNoEncontradoException(metodoPagoId));
     }
 
     public MetodoPago guardar(MetodoPagoPostDTO metodoPagoACrear){
@@ -36,23 +32,16 @@ public class MetodoPagoService {
         return metodoPagoGuardado;
     }
 
-    public MetodoPago actualizarPut(MetodoPagoPostDTO metodoPago, UUID metodoPagoId){
-        MetodoPago metodoPagoAActualizar = mpRepo.update(metodoPago,metodoPagoId);
-        if (metodoPagoAActualizar == null){
-            return null;
+    public MetodoPago actualizarPut(MetodoPagoPostDTO metodoPagoAActualizar, UUID metodoPagoId){
+        return mpRepo.update(metodoPagoAActualizar,metodoPagoId)
+                .orElseThrow(() -> new MetodoPagoNoEncontradoException(metodoPagoId));
+    }
+
+    public void eliminar(UUID metodoPagoId){
+        int rows = mpRepo.deleteById(metodoPagoId);
+        if(rows == 0){
+            throw new MetodoPagoNoEncontradoException(metodoPagoId);
         }
-        return metodoPagoAActualizar;
     }
 
-    public int eliminar(UUID metodo_pago_id){
-        return mpRepo.deleteById(metodo_pago_id);
-    }
-
-    private MetodoPagoGetDTO toDTO(MetodoPago m) {
-        return new MetodoPagoGetDTO(
-                m.getId(),
-                m.getNombre(),
-                m.getComision()
-        );
-    }
 }
