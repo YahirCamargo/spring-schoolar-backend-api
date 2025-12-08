@@ -41,7 +41,14 @@ public class DetalleCarritoService {
     public DetalleCarrito guardar(DetalleCarritoPostDTO detalleCarritoACrear){
         uRepo.findById(detalleCarritoACrear.getUsuariosId())
                     .orElseThrow(() -> new UsuarioNoEncontradoException(detalleCarritoACrear.getUsuariosId()));
-
+        DetalleCarrito detalleCarrito= dCRepo.detalle_carrito_exists(detalleCarritoACrear.getUsuariosId(),detalleCarritoACrear.getProductosId());
+// Esto hace la suma de los productos si son el mismo producto
+        if (detalleCarrito!= null)
+        {
+            DetalleCarritoPutDTO detalle = new DetalleCarritoPutDTO(detalleCarrito.getCantidad()+detalleCarritoACrear.getCantidad());
+           return dCRepo.update(detalle,detalleCarrito.getId())
+                    .orElseThrow(() -> new DetalleCarritoNoEncontradoException(detalleCarrito.getId()));
+        }
         BigDecimal precioProducto = pRepo.findPrecioById(detalleCarritoACrear.getProductosId())
                     .orElseThrow(() -> new ProductoNoEncontradoException(detalleCarritoACrear.getProductosId()));
 

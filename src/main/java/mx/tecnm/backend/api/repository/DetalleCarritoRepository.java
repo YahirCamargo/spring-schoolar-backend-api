@@ -102,14 +102,12 @@ public class DetalleCarritoRepository {
         
         String sql = """
                 UPDATE detalles_carrito SET
-                    cantidad = :cantidad,
-                    precio = :precio
+                    cantidad = :cantidad
                 WHERE id = :id AND activo=TRUE
                 """;
 
         int rowsAffected = jdbc.sql(sql)
                 .param("cantidad", detalleCarritoACrear.getCantidad())
-                .param("precio", detalleCarritoACrear.getPrecio())
                 .param("id", detalleCarritoId)
                 .update();
 
